@@ -2,7 +2,7 @@
 # https://pabloariasal.github.io/2018/02/19/its-time-to-do-cmake-right/
 
 # mimumum cmake version that support targets
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.1.3)
 
 # include helper functions for printing variables
 # usage: cmake_print_variables(CMAKE_BUILD_TYPE)
@@ -20,8 +20,8 @@ endif()
 project(robotics_exp_proj VERSION 1.0.0)
 
 # project options
-option{BUILD_THIRD_PARTY "Build third party dependencies" OFF}
-option{BUILD_SHARED_LIBS "Build shared libraries" OFF}
+option(BUILD_THIRD_PARTY "Build third party dependencies" OFF)
+option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
 # project default settings
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Cmake_tools/DefaultBuildType.cmake)
@@ -119,7 +119,7 @@ if (${BUILD_TESTING})
     )
 
     # link libraries
-    target_link_libraries()(
+    target_link_libraries(
         ${PROJECT_NAME}_test
         robotics::${PROJECT_NAME}
         ${GTEST_BOTH_LIBRARIES}
