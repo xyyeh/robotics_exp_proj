@@ -2,7 +2,7 @@
 # https://pabloariasal.github.io/2018/02/19/its-time-to-do-cmake-right/
 
 # mimumum cmake version that support targets
-cmake_minimum_required(VERSION 3.1.3)
+cmake_minimum_required(VERSION 3.2)
 
 # include helper functions for printing variables
 # usage: cmake_print_variables(CMAKE_BUILD_TYPE)
@@ -50,7 +50,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 file(GLOB SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cc)
 
 # create library with default build type
-message(STATUS, "Setting library build type as ${default_lib_build_type}")
+message(STATUS "Setting library build type as ${default_lib_build_type}")
 add_library(${PROJECT_NAME} "${default_lib_build_type}" ${SRC_FILES})
 
 # create an alias of the library using robotics namespace
@@ -72,7 +72,7 @@ target_include_directories(
 # set compile features to require c++14
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
 # make warnings in to errors for this project only
-target_compile_options(S{PROJECT_NAME} PRIVATE -Werror)
+target_compile_options(${PROJECT_NAME} PRIVATE -Werror)
 # specify required features such as cxx_*
 # target_compile_features(${PROJECT_NAME} PRIVATE cxx_lambdas)
 set(CMAKE_VERBOSE_MAKEFILE ON)
@@ -85,13 +85,13 @@ if (${BUILD_THIRD_PARTY})
     include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Cmake_tools/GitSubmoduleUpdateInit.cmake)
 
     # add dependency to the build
-    if (NOT TARGET <robotics_x>)
-        GitSubmoduleUpdateInit(third_party/robotics_x)
-        add_subdirectory(third_party/robotics_x)
-    endif()
+    # if (NOT TARGET <robotics_x>)
+    #     GitSubmoduleUpdateInit(third_party/robotics_x)
+    #     add_subdirectory(third_party/robotics_x)
+    # endif()
 else()
     # otherwise, find installed packages
-    find_package(robotics_x REQUIRED)
+    # find_package(robotics_x REQUIRED)
 endif()
 
 # install library
@@ -101,7 +101,7 @@ InstallLibrary()
 
 # test
 # add more tests using add_test(). BUILD_TESTING is automatically set ON by CTest
-include(CTest)
+include( CTest )
 if (${BUILD_TESTING})
     # create executable from source
     file(GLOB TEST_FILES ${CMAKE_CURRENT_SOURCE_DIR}/test/*.cc)

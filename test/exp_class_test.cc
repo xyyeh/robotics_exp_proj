@@ -10,7 +10,7 @@ namespace exp_proj {
 // https://github.com/google/googletest/blob/master/googletest/docs/primer.md
 
 class ExpClassTest : public ::testing::Test {
-protected:
+ protected:
   ExpClassTest() {}
   virtual ~ExpClassTest() {}
 
@@ -37,5 +37,5 @@ TEST_F(ExpClassTest, CheckClassMethod) {
   int x = 1;
   EXPECT_EQ(x, 1);
 }
-} // namespace exp_proj
-} // namespace robotics
+}  // namespace exp_proj
+}  // namespace robotics

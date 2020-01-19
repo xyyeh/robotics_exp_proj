@@ -32,13 +32,13 @@ struct DataStructure {
 };
 
 class ExpClass {
-private:
+ private:
   /** member variable */
   uint32_t parameter_;
 
-public:
-  ExpClass();
-  virtual ~ExpClass();
+ public:
+  ExpClass(){};
+  virtual ~ExpClass(){};
 
   /**
    * \brief Function brief description
@@ -59,7 +59,7 @@ public:
   void SetParameter(const uint32_t &param) { parameter_ = param; }
 };
 
-} // namespace exp_proj
-} // namespace robotics
+}  // namespace exp_proj
+}  // namespace robotics
 
 #endif
