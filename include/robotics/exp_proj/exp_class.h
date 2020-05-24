@@ -18,8 +18,7 @@
  * Created on: Wed Apr 13 18:39:37 2005
  */
 
-#ifndef ROBOTICS_EXP_PROJ_H_
-#define ROBOTICS_EXP_PROJ_H_
+#pragma once
 
 #include <string>
 
@@ -61,5 +60,3 @@ class ExpClass {
 
 }  // namespace exp_proj
 }  // namespace robotics
-
-#endif

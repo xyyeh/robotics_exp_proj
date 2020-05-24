@@ -8,34 +8,45 @@ cmake_minimum_required(VERSION 3.2)
 # usage: cmake_print_variables(CMAKE_BUILD_TYPE)
 include(CMakePrintHelpers)
 
-# git submodule Cmake_tools for subsequent use
-if (NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Cmake_tools/.git)
+# git submodule cmake_tools for subsequent use
+if (NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_tools/.git)
     execute_process(
-        COMMAND git submodule update --init cmake/Cmake_tools
+        COMMAND git submodule update --init cmake/cmake_tools
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         )
 endif()
 
 # project configuration
+# 1.x.x - update if incompatible API changes are made
+# x.1.x - update if changes are backward compatible
+# x.x.1 - update if backward compatible bug fixes are made
 project(robotics_exp_proj VERSION 1.0.0)
 
-# project options
+# third party options
 option(BUILD_THIRD_PARTY "Build third party dependencies" OFF)
-option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
 # project default settings
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Cmake_tools/DefaultBuildType.cmake)
+# debug/release builds
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_tools/DefaultBuildType.cmake)
 DefaultBuildType()
-set(default_lib_build_type "STATIC")
+# static/shared library builds are defined using arguments
+option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
-# install dependencies
+# setup dependencies
 if(${BUILD_THIRD_PARTY})
-    include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Cmake_tools/BuildThirdParty.cmake)
-    BuildThirdParty(${CMAKE_CURRENT_SOURCE_DIR}/third_party/build_third_party.sh)
+    include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_tools/BuildThirdParty.cmake)
+
+    find_package(spdlog 1.6.0 HINTS ${CMAKE_INSTALL_PREFIX})
+    if(NOT ${spdlog_FOUND})
+        message(STATUS "Fetching spdlog")
+        BuildThirdParty(${CMAKE_CURRENT_SOURCE_DIR}/third_party/build_spdlog.sh)
+    else()
+        message(STATUS "Found spdlog at ${spdlog_DIR}")
+    endif()
 endif()
 
 # setup library version with branch and commit hash
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Cmake_tools/GitVersion.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_tools/GitVersion.cmake)
 GitVersion()
 configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/config.h.in"
@@ -50,8 +61,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 file(GLOB SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cc)
 
 # create library with default build type
-message(STATUS "Setting library build type as ${default_lib_build_type}")
-add_library(${PROJECT_NAME} "${default_lib_build_type}" ${SRC_FILES})
+add_library(${PROJECT_NAME} ${SRC_FILES})
 
 # create an alias of the library using robotics namespace
 add_library(robotics::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
@@ -61,11 +71,11 @@ add_library(robotics::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 # private includes are used only to build and will not be installed
 target_include_directories(
     ${PROJECT_NAME}
-    # Public if includes are used for build and offerred to clients
+    # Public if includes are used for build and exposed
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>
         $<INSTALL_INTERFACE:include> #<prefix>/include/${PROJECT_NAME}
-    # Private if includes are used for build and not offerred to clients    
+    # Private if includes are used for build and not exposed  
     PRIVATE
 )
 
@@ -82,7 +92,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 # private dependencies will be used in source and their interface is not offerred to clients
 if (${BUILD_THIRD_PARTY})
     # submodule third party dependencies
-    include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Cmake_tools/GitSubmoduleUpdateInit.cmake)
+    include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_tools/GitSubmoduleUpdateInit.cmake)
 
     # add dependency to the build
     # if (NOT TARGET <robotics_x>)
@@ -95,7 +105,7 @@ else()
 endif()
 
 # install library
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Cmake_tools/InstallLibrary.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_tools/InstallLibrary.cmake)
 InstallLibrary()
 
 
